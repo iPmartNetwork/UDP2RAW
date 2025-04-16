@@ -3,13 +3,7 @@
 <div align="right">
 
 
- - ابتدا سرور ایران را آپدیت کنید
-<div align="left">
- 
-```
-apt update -y && apt upgrade -y
-```
-<div align="right">
+ <div align="right">
 
 
  - اسکریپت راه اندازی تانل بین سرور ایران و خارج
