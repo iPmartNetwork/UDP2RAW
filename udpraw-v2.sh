@@ -16,8 +16,8 @@ LOG_FILE="/var/log/udp2raw_wg_pro.log"
 # Check requirements
 check_requirements() {
     echo -e "${BLUE}Checking requirements...${NC}"
-    apt update -y && apt install -y wireguard-tools dialog curl iptables-persistent || \
-    yum install -y epel-release && yum install -y wireguard-tools dialog curl iptables-services || \
+    apt update -y && apt install -y wireguard-tools dialog curl tar iptables-persistent || \
+    yum install -y epel-release && yum install -y wireguard-tools dialog curl tar iptables-services || \
     { echo "Package installation failed."; exit 1; }
 
     if [ ! -f "$UDP2RAW_BIN" ]; then
@@ -29,30 +29,37 @@ check_requirements() {
 
 # Install udp2raw
 install_udp2raw() {
-    echo -e "${BLUE}Installing udp2raw from official release...${NC}"
+    echo -e "${BLUE}Installing udp2raw from wangyu- official release...${NC}"
     mkdir -p "$UDP2RAW_DIR"
     cd "$UDP2RAW_DIR" || exit
 
+    curl -LO https://github.com/wangyu-/udp2raw/releases/download/20230206.0/udp2raw_binaries.tar.gz
+    if [ ! -f "udp2raw_binaries.tar.gz" ]; then
+        echo -e "${RED}Failed to download udp2raw binaries.${NC}"
+        exit 1
+    fi
+
+    tar -xzf udp2raw_binaries.tar.gz
+
     ARCH=$(uname -m)
     if [[ "$ARCH" == "x86_64" ]]; then
-        FILE_NAME="udp2raw_amd64"
+        BIN_NAME="udp2raw_amd64"
     elif [[ "$ARCH" == "aarch64" ]]; then
-        FILE_NAME="udp2raw_aarch64"
+        BIN_NAME="udp2raw_aarch64"
     else
         echo -e "${RED}Unsupported architecture: $ARCH${NC}"
         exit 1
     fi
 
-    DOWNLOAD_URL="https://github.com/iPmartNetwork/UDP2RAW/releases/download/20230206.0/$FILE_NAME"
-
-    curl -Lo "$UDP2RAW_BIN" "$DOWNLOAD_URL"
-    if [ ! -f "$UDP2RAW_BIN" ]; then
-        echo -e "${RED}Failed to download udp2raw binary.${NC}"
+    if [ ! -f "$BIN_NAME" ]; then
+        echo -e "${RED}Binary for architecture $ARCH not found.${NC}"
         exit 1
     fi
 
+    cp "$BIN_NAME" "$UDP2RAW_BIN"
     chmod +x "$UDP2RAW_BIN"
-    echo -e "${BLUE}udp2raw installed successfully.${NC}"
+
+    echo -e "${BLUE}udp2raw installed successfully from wangyu-.${NC}"
 }
 
 # Generate WireGuard keys
