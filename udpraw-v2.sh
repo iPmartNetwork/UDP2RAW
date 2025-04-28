@@ -34,7 +34,7 @@ install_udp2raw() {
     cd "$UDP2RAW_DIR" || exit
 
     echo -e "${BLUE}Fetching latest udp2raw release info...${NC}"
-    LATEST_VERSION=$(curl -s https://api.github.com/repos/wangyu-/udp2raw/releases/latest | jq -r .tag_name)
+    LATEST_VERSION=$(curl -s https://api.github.com/repos/iPmartnetwork/udp2raw/releases/latest | jq -r .tag_name)
 
     if [ -z "$LATEST_VERSION" ]; then
         echo -e "${RED}Failed to fetch latest udp2raw version.${NC}"
@@ -43,7 +43,7 @@ install_udp2raw() {
 
     echo -e "${BLUE}Latest version found: $LATEST_VERSION${NC}"
 
-    DOWNLOAD_URL="https://github.com/wangyu-/udp2raw/releases/download/${LATEST_VERSION}/udp2raw_binaries.tar.gz"
+    DOWNLOAD_URL="https://github.com/iPmartnetwork/udp2raw/releases/download/${LATEST_VERSION}/udp2raw_binaries.tar.gz"
 
     curl -LO "$DOWNLOAD_URL"
     if [ ! -f "udp2raw_binaries.tar.gz" ]; then
