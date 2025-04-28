@@ -21,19 +21,6 @@ bash <(curl -Ls https://raw.githubusercontent.com/iPmartNetwork/UDP2RAW/main/udp
 
 # ورژن 2
 
-###ساختار منو
-
-
-Main Menu
-├── Create Server
-├── Create Client
-├── Manage Clients
-│   ├── View Existing Clients
-│   ├── Remove Client
-├── Firewall Settings
-├── View Logs
-└── Exit
-
 
 
 
