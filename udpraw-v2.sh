@@ -16,8 +16,8 @@ LOG_FILE="/var/log/udp2raw_wg_pro.log"
 # Check requirements
 check_requirements() {
     echo -e "${BLUE}Checking requirements...${NC}"
-    apt update -y && apt install -y wireguard-tools dialog curl tar iptables-persistent || \
-    yum install -y epel-release && yum install -y wireguard-tools dialog curl tar iptables-services || \
+    apt update -y && apt install -y wireguard-tools dialog curl tar jq iptables-persistent || \
+    yum install -y epel-release && yum install -y wireguard-tools dialog curl tar jq iptables-services || \
     { echo "Package installation failed."; exit 1; }
 
     if [ ! -f "$UDP2RAW_BIN" ]; then
@@ -29,11 +29,23 @@ check_requirements() {
 
 # Install udp2raw
 install_udp2raw() {
-    echo -e "${BLUE}Installing udp2raw from wangyu- official release...${NC}"
+    echo -e "${BLUE}Installing udp2raw from wangyu- official release (dynamic)...${NC}"
     mkdir -p "$UDP2RAW_DIR"
     cd "$UDP2RAW_DIR" || exit
 
-    curl -LO https://github.com/wangyu-/udp2raw/releases/download/20230206.0/udp2raw_binaries.tar.gz
+    echo -e "${BLUE}Fetching latest udp2raw release info...${NC}"
+    LATEST_VERSION=$(curl -s https://api.github.com/repos/wangyu-/udp2raw/releases/latest | jq -r .tag_name)
+
+    if [ -z "$LATEST_VERSION" ]; then
+        echo -e "${RED}Failed to fetch latest udp2raw version.${NC}"
+        exit 1
+    fi
+
+    echo -e "${BLUE}Latest version found: $LATEST_VERSION${NC}"
+
+    DOWNLOAD_URL="https://github.com/wangyu-/udp2raw/releases/download/${LATEST_VERSION}/udp2raw_binaries.tar.gz"
+
+    curl -LO "$DOWNLOAD_URL"
     if [ ! -f "udp2raw_binaries.tar.gz" ]; then
         echo -e "${RED}Failed to download udp2raw binaries.${NC}"
         exit 1
@@ -59,7 +71,7 @@ install_udp2raw() {
     cp "$BIN_NAME" "$UDP2RAW_BIN"
     chmod +x "$UDP2RAW_BIN"
 
-    echo -e "${BLUE}udp2raw installed successfully from wangyu-.${NC}"
+    echo -e "${BLUE}udp2raw installed successfully from version $LATEST_VERSION.${NC}"
 }
 
 # Generate WireGuard keys
